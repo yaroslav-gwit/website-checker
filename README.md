@@ -9,6 +9,9 @@
 - Site status code check
 - Check for a certain string on a webpage
 
+## Compatibility
+Python 3.10+
+
 ## Installation
 1. Clone this repo
 ```
