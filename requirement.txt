@@ -1,0 +1,4 @@
+typer
+pyOpenSSL
+PyYAML
+tabulate

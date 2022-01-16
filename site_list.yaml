@@ -1,0 +1,12 @@
+---
+websites:
+  - site_name: "gateway-it.com"
+    site_port: 443
+    amber_days: 7
+    site_owner: "Yaroslav Koisa"
+    description: This is a test description
+
+  - site_name: "google.com"
+    site_port: 443
+    amber_days: 60
+    site_owner: "Google"
