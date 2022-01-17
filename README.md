@@ -12,6 +12,9 @@
 ## Compatibility
 Python 3.10+
 
+### If you are running Debian or Ubuntu, it's better to use docker container:
+https://hub.docker.com/r/mexicanrancher/website-checker
+
 ## Installation
 1. Clone this repo
 ```
