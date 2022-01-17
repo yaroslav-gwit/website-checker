@@ -9,6 +9,13 @@
 - Site status code check
 - Check for a certain string on a webpage
 - Zabbix integration
+#### There will be a FastAPI endpoint exposed at some point too.
+ > This should help the intergration with tools like Zabbix and Prometheus
+##### The feature list will include
+- Adding a website to the list
+- Removing a website from the list
+- Checking a list of websites
+- Checking a signle website
 
 ## Compatibility
 Python 3.10+
