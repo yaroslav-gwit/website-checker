@@ -9,8 +9,8 @@
 - Site status code check
 - Check for a certain string on a webpage
 - Zabbix integration
-#### There will be a FastAPI endpoint exposed at some point too.
- > This should help the intergration with tools like Zabbix and Prometheus
+#### There should be a FastAPI endpoint exposed at some point too
+ > This will help integration with the tools like Zabbix and Prometheus
 ##### The feature list will include
 - Adding a website to the list
 - Removing a website from the list
