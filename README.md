@@ -11,7 +11,7 @@
 - Zabbix integration
 #### There should be a FastAPI endpoint exposed at some point too
  > This will help integration with the tools like Zabbix and Prometheus
-##### The feature list will include
+##### The feature list will include:
 - Adding a website to the list
 - Removing a website from the list
 - Checking a list of websites
