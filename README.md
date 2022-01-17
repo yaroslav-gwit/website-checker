@@ -12,7 +12,7 @@
 ## Compatibility
 Python 3.10+
 
-### If you are running Debian or Ubuntu, it's better to use docker container:
+### If you are running Debian or Ubuntu, it's better to use a docker container:
 https://hub.docker.com/r/mexicanrancher/website-checker
 
 ## Installation
