@@ -8,6 +8,7 @@
 - Site response time check
 - Site status code check
 - Check for a certain string on a webpage
+- Zabbix integration
 
 ## Compatibility
 Python 3.10+
