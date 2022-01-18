@@ -78,6 +78,22 @@ websites:
   - site_name: yahoo.com
 ```
 
+The last example shown here, will include `--json-output` flag. It is mostly used for Zabbix integration, or any other system where JSON output format is supported.
+```
+docker run -it --rm -v /root/site_list.yaml:/usr/src/app/site_list.yaml mexicanrancher/website-checker /usr/src/app/website_monitor.py yaml-file --json-output
+#or
+docker run -it --rm mexicanrancher/website-checker /usr/src/app/website_monitor.py check-site gateway-it.com
+```
+
+Example output:
+```
+#For the YAML-FILE option
+[{"site_name": "google.com", "ssl_cert_eol": "2022-03-21 06:02:10", "status": 1, "owner": "Google"}, {"site_name": "gateway-it.com", "ssl_cert_eol": "2022-01-12 18:35:15", "status": 2, "owner": "Yaroslav Koisa"}, {"site_name": "yahoo.com", "ssl_cert_eol": "2022-06-15 23:59:59", "status": 1}]
+
+#For the CHECK-SITE option
+{"site_name": "gateway-it.com", "ssl_eol": "2022-03-21 12:37:44", "site_status": 1}
+```
+
 ### Manual (recommended for develovers, or experienced Python users)
 1. Clone this repo
 ```
