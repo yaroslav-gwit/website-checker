@@ -207,6 +207,6 @@ def yaml_file(file: str = typer.Option("site_list.yaml", help="Your config file 
         print(GiveInfo.yaml_table_output(file))
 
 
-''' If this file is executed from the command line, activate Typer '''
+""" If this file is executed from the command line, activate Typer """
 if __name__ == "__main__":
     app()
