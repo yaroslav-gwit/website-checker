@@ -9,6 +9,7 @@
 - Site status code check
 - Check for a certain string on a webpage
 - Zabbix integration
+- SNI website checks
 #### There should be a FastAPI endpoint exposed at some point too
 ##### The feature list will include:
 - Adding a website to the list
