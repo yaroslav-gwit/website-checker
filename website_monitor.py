@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
 from datetime import datetime
 from datetime import timedelta
 import typer
