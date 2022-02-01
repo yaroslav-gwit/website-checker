@@ -34,14 +34,14 @@ class GetSiteInfo:
         self.site_port = site_port
         self.amber_days = timedelta(amber_days)
 
-        '''
+        """
         site response collection -- future code:
         import response
         response = requests.get("https://gateway-it.com/", timeout=3)
         respTime = response.elapsed.total_seconds()
         currDate = datetime.now()[:-7]
         print(currDate + " " + respTime)
-        '''
+        """
 
         if not self.site_address:
             print("Please set the 'site_address' variable!")
@@ -90,6 +90,11 @@ class GetSiteInfo:
             status_good = "Site is okay"
             return [self.site_address, self.expiration_date, status_good]
 
+    def check_status_code(self):
+        return self
+
+    def check_page_string(self):
+        return self
 
 class GiveInfo:
     """ This class will form the info and pass it over to user """
