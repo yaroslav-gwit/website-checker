@@ -1,4 +1,5 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3
+#Script requires >=python3.10
 from datetime import datetime
 from datetime import timedelta
 import typer
@@ -7,23 +8,46 @@ import ssl
 import yaml
 import json
 from tabulate import tabulate
-
-# import re
+import sys
+import os
+import re
 # import requests
 
+
 app = typer.Typer(context_settings=dict(max_content_width=800))
+
 
 
 class ReadWriteYaml:
     """ This class reads and writes YAML config file """
 
-    def __init__(self, yaml_file_location="site_list.yaml"):
+    def __init__(self, yaml_file_location="site_list.yaml", yaml_input_dict = None):
         site_list_yaml_location = yaml_file_location
+
+        if not os.path.exists(site_list_yaml_location):
+            print("The database file doesn't exits!")
+            sys.exit(1)
 
         with open(site_list_yaml_location, 'r') as file:
             self.site_list_yaml = yaml.safe_load(file)
 
-        self.website_list = self.site_list_yaml["websites"]
+        self.site_list_yaml_location = site_list_yaml_location
+        self.yaml_input_dict = yaml_input_dict
+
+        if os.stat(site_list_yaml_location).st_size != 0:
+            self.website_list = self.site_list_yaml["websites"]
+        else:
+            self.website_list = []
+
+
+    def write(self):
+        if self.yaml_input_dict:
+            with open(self.site_list_yaml_location, 'w') as file:
+                yaml.dump(self.yaml_input_dict, file, sort_keys=False)
+        else:
+            print("There is no input (dictionary) to work with!")
+            sys.exit(119)
+
 
 
 class GetSiteInfo:
@@ -56,6 +80,7 @@ class GetSiteInfo:
             self.expiration_date = "N/A"
             self.status_unreachable = True
 
+
     def ssl_expiry_date_machine(self):
         """
         Status codes:
@@ -72,6 +97,7 @@ class GetSiteInfo:
             return [self.site_address, self.expiration_date, 3]
         elif (self.expiration_date - self.amber_days) > datetime.now():
             return [self.site_address, self.expiration_date, 1]
+
 
     def ssl_expiry_date_human(self):
         if self.status_unreachable:
@@ -90,14 +116,19 @@ class GetSiteInfo:
             status_good = "Site is okay"
             return [self.site_address, self.expiration_date, status_good]
 
+
     def check_status_code(self):
         return self
+
 
     def check_page_string(self):
         return self
 
+
+
 class GiveInfo:
     """ This class will form the info and pass it over to user """
+
     @staticmethod
     def single_site_table_output(site_name, site_port=443, amber_days=30):
         checked_sites_list = []
@@ -110,6 +141,7 @@ class GiveInfo:
         checked_sites_list = checked_sites_list
         return tabulate(checked_sites_list, headers="firstrow", tablefmt="fancy_grid")
 
+
     @staticmethod
     def single_site_json_output(site_name, site_port=443, amber_days=30):
         get_site_info_output = GetSiteInfo(site_name, site_port, amber_days).ssl_expiry_date_machine()
@@ -117,6 +149,7 @@ class GiveInfo:
                        "site_status": get_site_info_output[2]}
         json_output = json.dumps(json_output)
         return json_output
+
 
     @staticmethod
     def yaml_table_output(yaml_file_location):
@@ -143,6 +176,7 @@ class GiveInfo:
         checked_sites_list = checked_sites_list
         return tabulate(checked_sites_list, headers="firstrow", showindex=range(1, len(checked_sites_list)),
                         tablefmt="fancy_grid")
+
 
     @staticmethod
     def yaml_json_output(yaml_file_location):
@@ -181,15 +215,14 @@ class GiveInfo:
 
 """ Section below is responsible for the CLI input/output """
 
-
 @app.command()
-def check_site(site_address: str = typer.Argument(..., help="Your website address, for example gateway-it.com"),
+def site_check(site_address: str = typer.Argument(..., help="Your website address, for example gateway-it.com"),
                port: int = typer.Option(443, help="Specify a port number for your website"),
                amber_days: int = typer.Option(30, help="Specify a number of days for an amber trigger"),
                json_output: bool = typer.Option(False, help="Use json output"),
                ):
     """
-    Example: ./ssl_date_check.py check-site gateway-it.com [ --port 443 ]
+    Example: ./endpoint_checker check-site gateway-it.com [ --port 443 ]
     """
 
     if json_output:
@@ -199,19 +232,95 @@ def check_site(site_address: str = typer.Argument(..., help="Your website addres
 
 
 @app.command()
-def yaml_file(file: str = typer.Option("site_list.yaml", help="Your config file location"),
+def db_check(file: str = typer.Option("site_list.yaml", help="Your config file location"),
               json_output: bool = typer.Option(False, help="Use json output"),
               ):
     """
-    Example: ./ssl_date_check.py yaml-file [ --config site_list.yaml ]
+    Example: ./endpoint_checker db-check [ --file site_list.yaml ]
     """
-
     if json_output:
         print(GiveInfo.yaml_json_output(file))
     else:
         print(GiveInfo.yaml_table_output(file))
 
 
+@app.command()
+def db_add(file:str = typer.Option("site_list.yaml", help="Your config file location"),
+                site_name:str = typer.Argument(..., help="Website address or domain, ie gateway-it.com"),
+                site_port:int = typer.Option(443, help="SSL port used by the website"),
+                site_owner:str = typer.Option("", help="Specify site owner"),
+                amber_days:int = typer.Option(30, help="Days to mark site as \"amber\""),
+                description:str = typer.Option("", help="Site description"),
+            ):
+    """
+    Example: ./endpoint_checker db-add gateway-it.com [ --file site_list.yaml --site-owner \"Yaroslav Koisa\"]
+    """
+
+    if not os.path.exists(file):
+        with open(file, 'w') as _file:
+            pass
+
+    new_ws_dict = {}
+    new_ws_dict["site_name"] = site_name
+    new_ws_dict["site_port"] = site_port
+    new_ws_dict["amber_days"] = amber_days
+    if site_owner:
+        new_ws_dict["site_owner"] = site_owner
+    if description:
+        new_ws_dict["description"] = description
+
+    yaml_dict = ReadWriteYaml(yaml_file_location=file).website_list
+
+    for site_number in range(0, len(yaml_dict)):
+        site_name_in_db = str(yaml_dict[site_number]["site_name"])
+        site_name_specified = "^" + site_name + "$"
+        if re.match(site_name_specified, site_name_in_db):
+            print("This site already exists in our database!")
+            sys.exit(1)
+        
+        elif site_number == len(yaml_dict) -1:
+            yaml_dict.append(new_ws_dict)
+            yaml_dict_to_write = {}
+            yaml_dict_to_write["websites"] = yaml_dict
+            ReadWriteYaml(yaml_file_location=file, yaml_input_dict=yaml_dict_to_write).write()
+            print("The site " + site_name + " was added to the database.")
+            break
+
+
+@app.command()
+def db_remove(
+                file: str = typer.Option("site_list.yaml", help="Your config file location"),
+                site_name:str = typer.Argument(..., help="Website address or domain, ie gateway-it.com"),
+                ):
+    """
+    Example: ./endpoint_checker db-remove gateway-it.com [ --file site_list.yaml ]
+    """
+
+    yaml_dict = ReadWriteYaml(yaml_file_location=file).website_list
+
+    if len(yaml_dict) == 0:
+        print("The database is empty! Nothing could be removed.")
+        sys.exit(0)
+
+    for site_number in range(0, len(yaml_dict)):
+        site_name_in_db = str(yaml_dict[site_number]["site_name"])
+        site_name_specified = "^" + site_name + "$"
+        if re.match(site_name_specified, site_name_in_db):
+            del yaml_dict[site_number]
+            yaml_dict_to_write = {}
+            yaml_dict_to_write["websites"] = yaml_dict
+            ReadWriteYaml(yaml_file_location=file, yaml_input_dict=yaml_dict_to_write).write()
+            print("The site " + site_name + " was removed from the database!")
+            break
+        
+        elif site_number == len(yaml_dict) -1:
+            print("The site " + site_name + " could not be found in our database!")
+            sys.exit(1)
+
+
+
+
 """ If this file is executed from the command line, activate Typer """
+
 if __name__ == "__main__":
     app()
