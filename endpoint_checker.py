@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-#Script requires >=python3.10
+#!/usr/bin/env python3.10
 from datetime import datetime
 from datetime import timedelta
 import typer
@@ -12,9 +11,6 @@ import sys
 import os
 import re
 # import requests
-
-
-app = typer.Typer(context_settings=dict(max_content_width=800))
 
 
 
@@ -214,6 +210,8 @@ class GiveInfo:
 
 
 """ Section below is responsible for the CLI input/output """
+app = typer.Typer(context_settings=dict(max_content_width=800))
+
 
 @app.command()
 def site_check(site_address: str = typer.Argument(..., help="Your website address, for example gateway-it.com"),
